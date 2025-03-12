@@ -47,10 +47,16 @@
 </head>
 <body>
     <div class="container">
-        <div id="loginPage">
+        <div id="authPage">
+            <h1>Mind Game - Login / Register</h1>
+            <input type="text" id="username" placeholder="Enter your username">
+            <button onclick="registerUser()">Register</button>
+            <button onclick="loginUser()">Login</button>
+            <button onclick="playAsGuest()">Play as Guest</button>
+        </div>
+        
+        <div id="gameSetup" class="hidden">
             <h1>Welcome to the Mind Game</h1>
-            <p>Create an account or login</p>
-            <input type="text" id="playerName" placeholder="Enter your name">
             <label for="levelSelect">Select Level:</label>
             <select id="levelSelect">
                 <option value="1">Level 1</option>
@@ -85,18 +91,42 @@
         let correctStreak = 0;
         let highestStreaks = {};
         let players = [];
-        let currentPlayerIndex = 0;
+        let currentPlayer = "";
         let level = 1;
+        let isGuest = false;
 
-        function startGame() {
-            let playerName = document.getElementById("playerName").value.trim();
-            level = parseInt(document.getElementById("levelSelect").value);
-            if (!playerName) {
-                alert("Please enter your name");
+        function registerUser() {
+            let username = document.getElementById("username").value.trim();
+            if (!username) {
+                alert("Please enter a username");
                 return;
             }
-            players.push({ name: playerName, lives: 3, streak: 0 });
-            document.getElementById("loginPage").classList.add("hidden");
+            localStorage.setItem(username, JSON.stringify({ streak: 0 }));
+            alert("Registration successful! You can now log in.");
+        }
+
+        function loginUser() {
+            let username = document.getElementById("username").value.trim();
+            if (!username || !localStorage.getItem(username)) {
+                alert("User not found. Please register first.");
+                return;
+            }
+            currentPlayer = username;
+            document.getElementById("authPage").classList.add("hidden");
+            document.getElementById("gameSetup").classList.remove("hidden");
+        }
+
+        function playAsGuest() {
+            isGuest = true;
+            currentPlayer = "Guest";
+            document.getElementById("authPage").classList.add("hidden");
+            document.getElementById("gameSetup").classList.remove("hidden");
+        }
+
+        function startGame() {
+            level = parseInt(document.getElementById("levelSelect").value);
+            players.push({ name: currentPlayer, lives: 3, streak: 0 });
+            document.getElementById("gameSetup").classList.add("hidden");
             document.getElementById("gamePage").classList.remove("hidden");
             generateNumber();
         }
@@ -115,11 +145,11 @@
         }
 
         function checkInput() {
-            let player = players[currentPlayerIndex];
+            let player = players[0];
             let userValue = document.getElementById("userInput").value;
             if (userValue === sequence) {
                 player.streak++;
-                if (player.streak % 3 === 0) {
+                if (player.streak % 3 === 0 && player.streak > 0) {
                     player.lives = Math.min(3, player.lives + 1);
                 }
             } else {
@@ -129,33 +159,15 @@
             document.getElementById("lives").textContent = player.lives;
             if (player.lives === 0) {
                 alert(`Game over, ${player.name}!`);
+                if (!isGuest) saveStreak(player.name, player.streak);
                 retryGame();
                 return;
             }
-            highestStreaks[player.name] = Math.max(highestStreaks[player.name] || 0, player.streak);
-            updateDashboard();
+            if (!isGuest) saveStreak(player.name, player.streak);
             document.getElementById("userInput").value = "";
             document.getElementById("userInput").disabled = true;
             document.getElementById("submitBtn").disabled = true;
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
             setTimeout(generateNumber, 1000);
-        }
-
-        function retryGame() {
-            document.getElementById("gamePage").classList.add("hidden");
-            document.getElementById("loginPage").classList.remove("hidden");
-            players = [];
-            currentPlayerIndex = 0;
-        }
-
-        function updateDashboard() {
-            let streakList = document.getElementById("streakList");
-            streakList.innerHTML = "";
-            for (let player in highestStreaks) {
-                let li = document.createElement("li");
-                li.textContent = `${player} - ${highestStreaks[player]}`;
-                streakList.appendChild(li);
-            }
         }
     </script>
 </body>
