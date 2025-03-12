@@ -9,20 +9,36 @@
             font-family: Arial, sans-serif;
             text-align: center;
             padding: 50px;
+            background-color: #1e1e2e;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: #2b2b3d;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
         }
         #numberDisplay {
-            font-size: 24px;
+            font-size: 30px;
+            font-weight: bold;
             margin-bottom: 20px;
         }
-        input, select {
-            font-size: 18px;
-            padding: 5px;
-            margin: 5px;
-        }
-        button {
+        input, select, button {
             font-size: 18px;
             padding: 10px;
-            margin-top: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+        button {
+            background-color: #ff6b6b;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ff8787;
         }
         .hidden {
             display: none;
@@ -30,35 +46,37 @@
     </style>
 </head>
 <body>
-    <div id="loginPage">
-        <h1>Welcome to the Mind Game</h1>
-        <p>Create an account or login</p>
-        <input type="text" id="playerName" placeholder="Enter your name">
-        <label for="levelSelect">Select Level:</label>
-        <select id="levelSelect">
-            <option value="1">Level 1</option>
-            <option value="2">Level 2</option>
-            <option value="3">Level 3</option>
-            <option value="4">Level 4</option>
-            <option value="5">Level 5</option>
-        </select>
-        <button onclick="startGame()">Start Game</button>
-    </div>
-    
-    <div id="gamePage" class="hidden">
-        <h1>Number Memory Game</h1>
-        <p>Lives: <span id="lives">3</span></p>
-        <p>Highest Streak: <span id="highestStreak">0</span></p>
-        <div id="numberDisplay"></div>
-        <input type="text" id="userInput" placeholder="Enter the number" disabled>
-        <button id="submitBtn" onclick="checkInput()" disabled>Submit</button>
-        <p id="result"></p>
-        <button onclick="retryGame()">Retry</button>
-    </div>
-    
-    <div id="dashboard">
-        <h2>Game Dashboard</h2>
-        <ul id="streakList"></ul>
+    <div class="container">
+        <div id="loginPage">
+            <h1>Welcome to the Mind Game</h1>
+            <p>Create an account or login</p>
+            <input type="text" id="playerName" placeholder="Enter your name">
+            <label for="levelSelect">Select Level:</label>
+            <select id="levelSelect">
+                <option value="1">Level 1</option>
+                <option value="2">Level 2</option>
+                <option value="3">Level 3</option>
+                <option value="4">Level 4</option>
+                <option value="5">Level 5</option>
+            </select>
+            <button onclick="startGame()">Start Game</button>
+        </div>
+        
+        <div id="gamePage" class="hidden">
+            <h1>Number Memory Game</h1>
+            <p>Lives: <span id="lives">3</span></p>
+            <p>Highest Streak: <span id="highestStreak">0</span></p>
+            <div id="numberDisplay"></div>
+            <input type="text" id="userInput" placeholder="Enter the number" disabled>
+            <button id="submitBtn" onclick="checkInput()" disabled>Submit</button>
+            <p id="result"></p>
+            <button onclick="retryGame()">Retry</button>
+        </div>
+        
+        <div id="dashboard">
+            <h2>Game Dashboard</h2>
+            <ul id="streakList"></ul>
+        </div>
     </div>
     
     <script>
