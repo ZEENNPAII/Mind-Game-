@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mind Game - Number Memory</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+        #numberDisplay {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        input, select {
+            font-size: 18px;
+            padding: 5px;
+            margin: 5px;
+        }
+        button {
+            font-size: 18px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="loginPage">
+        <h1>Welcome to the Mind Game</h1>
+        <p>Create an account or login</p>
+        <input type="text" id="playerName" placeholder="Enter your name">
+        <label for="levelSelect">Select Level:</label>
+        <select id="levelSelect">
+            <option value="1">Level 1</option>
+            <option value="2">Level 2</option>
+            <option value="3">Level 3</option>
+            <option value="4">Level 4</option>
+            <option value="5">Level 5</option>
+        </select>
+        <button onclick="startGame()">Start Game</button>
+    </div>
+    
+    <div id="gamePage" class="hidden">
+        <h1>Number Memory Game</h1>
+        <p>Lives: <span id="lives">3</span></p>
+        <p>Highest Streak: <span id="highestStreak">0</span></p>
+        <div id="numberDisplay"></div>
+        <input type="text" id="userInput" placeholder="Enter the number" disabled>
+        <button id="submitBtn" onclick="checkInput()" disabled>Submit</button>
+        <p id="result"></p>
+        <button onclick="retryGame()">Retry</button>
+    </div>
+    
+    <div id="dashboard">
+        <h2>Game Dashboard</h2>
+        <ul id="streakList"></ul>
+    </div>
+    
+    <script>
+        let sequence = "";
+        let lives = 3;
+        let correctStreak = 0;
+        let highestStreaks = {};
+        let players = [];
+        let currentPlayerIndex = 0;
+        let level = 1;
+
+        function startGame() {
+            let playerName = document.getElementById("playerName").value.trim();
+            level = parseInt(document.getElementById("levelSelect").value);
+            if (!playerName) {
+                alert("Please enter your name");
+                return;
+            }
+            players.push({ name: playerName, lives: 3, streak: 0 });
+            document.getElementById("loginPage").classList.add("hidden");
+            document.getElementById("gamePage").classList.remove("hidden");
+            generateNumber();
+        }
+
+        function generateNumber() {
+            sequence = "";
+            for (let i = 0; i < 3 + level; i++) {
+                sequence += Math.floor(Math.random() * 10);
+            }
+            document.getElementById("numberDisplay").textContent = sequence;
+            setTimeout(() => {
+                document.getElementById("numberDisplay").textContent = "";
+                document.getElementById("userInput").disabled = false;
+                document.getElementById("submitBtn").disabled = false;
+            }, 2000);
+        }
+
+        function checkInput() {
+            let player = players[currentPlayerIndex];
+            let userValue = document.getElementById("userInput").value;
+            if (userValue === sequence) {
+                player.streak++;
+                if (player.streak % 3 === 0) {
+                    player.lives = Math.min(3, player.lives + 1);
+                }
+            } else {
+                player.lives--;
+                player.streak = 0;
+            }
+            document.getElementById("lives").textContent = player.lives;
+            if (player.lives === 0) {
+                alert(`Game over, ${player.name}!`);
+                retryGame();
+                return;
+            }
+            highestStreaks[player.name] = Math.max(highestStreaks[player.name] || 0, player.streak);
+            updateDashboard();
+            document.getElementById("userInput").value = "";
+            document.getElementById("userInput").disabled = true;
+            document.getElementById("submitBtn").disabled = true;
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+            setTimeout(generateNumber, 1000);
+        }
+
+        function retryGame() {
+            document.getElementById("gamePage").classList.add("hidden");
+            document.getElementById("loginPage").classList.remove("hidden");
+            players = [];
+            currentPlayerIndex = 0;
+        }
+
+        function updateDashboard() {
+            let streakList = document.getElementById("streakList");
+            streakList.innerHTML = "";
+            for (let player in highestStreaks) {
+                let li = document.createElement("li");
+                li.textContent = `${player} - ${highestStreaks[player]}`;
+                streakList.appendChild(li);
+            }
+        }
+    </script>
+</body>
+</html>
